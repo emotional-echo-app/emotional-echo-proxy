@@ -30,7 +30,7 @@ app.post('/analyze', async (req, res) => {
     });
 
     const data = await r.json();
-    const content = data.choices?.<a href="" class="citation-link" target="_blank" style="vertical-align: super; font-size: 0.8em; margin-left: 3px;">[0]</a>?.message?.content || '{}';
+   const content = data.choices?.[0]?.message?.content || '{}';
     res.json(JSON.parse(content));
 
   } catch (e) {
