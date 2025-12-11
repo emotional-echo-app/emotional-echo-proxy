@@ -9,6 +9,7 @@ app.use(express.json());
 
 const OPENAI_KEY = process.env.OPENAI_API_KEY;
 
+// OpenAI proxy endpoint
 app.post('/analyze', async (req, res) => {
   const text = req.body.text;
   if (!text) return res.status(400).json({ error: 'No text provided' });
@@ -17,7 +18,10 @@ app.post('/analyze', async (req, res) => {
     const payload = {
       model: 'gpt-4o-mini',
       messages: [
-        { role: 'system', content: 'You are a tone analysis assistant. Return JSON only: {score:number, suggestions:[strings]}' },
+        { 
+          role: 'system', 
+          content: 'You are a tone analysis assistant. Analyze the emotional tone of the text and return ONLY JSON in this format: {score: number (0-100), suggestions: [string, string, string]}'
+        },
         { role: 'user', content: text }
       ],
       max_tokens: 200
@@ -42,14 +46,26 @@ app.post('/analyze', async (req, res) => {
   }
 });
 
-// Add a health check endpoint
+// Health check endpoint
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log('Emotional Echo Proxy running on port', PORT));
+// Root endpoint
+app.get('/', (req, res) => {
+  res.json({ 
+    name: 'Emotional Echo Proxy',
+    status: 'running',
+    endpoints: ['POST /analyze', 'GET /health'] 
+  });
+});
 
-   
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log('Emotional Echo Proxy running on port', PORT);
+});
+
+
+
 
    
