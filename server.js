@@ -30,7 +30,7 @@ app.post('/analyze', async (req, res) => {
     });
 
     const data = await r.json();
-   const content = data.choices?.[0]?.message?.content || '{}';
+    const content = data.choices?.[0]?.message?.content || '{}';
     res.json(JSON.parse(content));
 
   } catch (e) {
@@ -40,4 +40,5 @@ app.post('/analyze', async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log('Proxy running on port', PORT));
+
 
