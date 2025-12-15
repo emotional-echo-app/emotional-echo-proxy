@@ -5,7 +5,6 @@ require('dotenv').config();
 
 const app = express();
 
-// IMPORTANT: allow Chrome extension + browsers
 app.use(cors({
   origin: '*',
   methods: ['GET', 'POST', 'OPTIONS'],
@@ -16,7 +15,6 @@ app.use(express.json());
 
 const OPENAI_KEY = process.env.OPENAI_API_KEY;
 
-// Analyze endpoint
 app.post('/analyze', async (req, res) => {
   try {
     const { text } = req.body;
@@ -37,8 +35,7 @@ app.post('/analyze', async (req, res) => {
         messages: [
           {
             role: 'system',
-            content:
-              'Analyze the emotional tone of the text. Respond ONLY with valid JSON: { "score": number, "suggestions": [string, string, string] }'
+            content: 'Analyze the emotional tone of the text. Respond ONLY with valid JSON: { "score": number, "suggestions": [string, string, string] }'
           },
           { role: 'user', content: text }
         ],
@@ -49,7 +46,6 @@ app.post('/analyze', async (req, res) => {
     const data = await response.json();
     console.log('OpenAI raw response:', JSON.stringify(data, null, 2));
     
-    // Clean way to get content without optional chaining
     let content = '{}';
     if (data.choices && data.choices<a href="" class="citation-link" target="_blank" style="vertical-align: super; font-size: 0.8em; margin-left: 3px;">[0]</a> && data.choices<a href="" class="citation-link" target="_blank" style="vertical-align: super; font-size: 0.8em; margin-left: 3px;">[0]</a>.message && data.choices<a href="" class="citation-link" target="_blank" style="vertical-align: super; font-size: 0.8em; margin-left: 3px;">[0]</a>.message.content) {
       content = data.choices<a href="" class="citation-link" target="_blank" style="vertical-align: super; font-size: 0.8em; margin-left: 3px;">[0]</a>.message.content;
@@ -57,7 +53,6 @@ app.post('/analyze', async (req, res) => {
     
     console.log('OpenAI content:', content);
 
-    // Try to parse the content
     try {
       const parsed = JSON.parse(content);
       console.log('Successfully parsed JSON');
@@ -66,7 +61,6 @@ app.post('/analyze', async (req, res) => {
       console.error('JSON parse error:', parseError.message);
       console.error('Raw content that failed:', content);
       
-      // Fallback response
       res.json({
         score: 50,
         suggestions: ["Check grammar", "Improve tone", "Add emotional appeal"]
@@ -78,12 +72,10 @@ app.post('/analyze', async (req, res) => {
   }
 });
 
-// Health check
 app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
-// Root endpoint
 app.get('/', (req, res) => {
   res.json({ 
     message: 'Emotional Echo Proxy is running',
@@ -93,5 +85,6 @@ app.get('/', (req, res) => {
 
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
-  console.log('✅ Proxy running on port', PORT);
+  console.log('Proxy running on port', PORT);
 });
+
