@@ -28,7 +28,34 @@ app.post('/analyze', async (req, res) => {
       return res.status(400).json({ error: 'No text provided' });
     }
 
-    const response = await fetch('https://api.openai.com/v1/responses', {
+   const response = await fetch('https://api.openai.com/v1/responses', {
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${OPENAI_KEY}`,
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    model: 'gpt-4o-mini',
+    input: `Analyze the emotional tone of the following text.
+Return ONLY valid JSON in this exact format:
+{
+  "score": number (0-100),
+  "suggestions": ["string", "string", "string"]
+}
+
+Text:
+"${text}"`
+  })
+});
+
+const data = await response.json();
+
+if (!response.ok) {
+  console.error('❌ OpenAI ERROR STATUS:', response.status);
+  console.error('❌ OpenAI ERROR BODY:', JSON.stringify(data, null, 2));
+  return res.status(500).json({ error: 'OpenAI request failed' });
+}
+
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${OPENAI_KEY}`,
