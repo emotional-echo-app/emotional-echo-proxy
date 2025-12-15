@@ -19,7 +19,71 @@ if (!OPENAI_KEY) {
   console.error('❌ OPENAI_API_KEY missing');
 }
 
-// Analyze endpoint
+app.post('/analyze', async (req, res) => {
+  const text = req.body.text;
+  if (!text) {
+    return res.status(400).json({ error: 'No text provided' });
+  }
+
+  try {
+    const response = await fetch('https://api.openai.com/v1/responses', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        input: [
+          {
+            role: 'system',
+            content:
+              'You are a tone analysis assistant. Respond ONLY with valid JSON. No markdown. No explanation.'
+          },
+          {
+            role: 'user',
+            content: `Analyze the emotional tone of this text and return ONLY JSON in this format:
+{
+  "score": number (0-100),
+  "suggestions": ["string", "string", "string"]
+}
+
+Text:
+"${text}"`
+          }
+        ]
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.error('OpenAI error:', data);
+      return res.status(500).json({ error: 'OpenAI request failed' });
+    }
+
+    const raw =
+      data.output_text ||
+      data.output?.[0]?.content?.[0]?.text ||
+      '';
+
+    // 🔐 Extract JSON safely
+    const match = raw.match(/\{[\s\S]*\}/);
+
+    if (!match) {
+      console.error('Invalid AI response:', raw);
+      return res.status(500).json({ error: 'Invalid AI response' });
+    }
+
+    const parsed = JSON.parse(match[0]);
+    res.json(parsed);
+
+  } catch (err) {
+    console.error('Server error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 app.post('/analyze', async (req, res) => {
   try {
     const { text } = req.body;
