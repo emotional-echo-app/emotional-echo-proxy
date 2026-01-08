@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "Emotional Echo",
+  "version": "1.0",
+  "description": "Analyze tone and emotional risk of emails.",
+  "permissions": ["storage", "activeTab", "scripting"],
+  "host_permissions": ["<your-proxy-url>"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "icons/icon48.png"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://mail.google.com/*", "https://outlook.live.com/*"],
+      "js": ["content_script.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}
